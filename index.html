@@ -27,8 +27,12 @@
     // Blocking script to prevent theme flash
     (function() {
       var saved = localStorage.getItem('theme');
-      var isDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else {
+        var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      }
     })();
   </script>
 </head>
@@ -39,6 +43,9 @@
   <!-- Glow Orbs (ambient background) -->
   <div class="glow-orb glow-orb-1" aria-hidden="true"></div>
   <div class="glow-orb glow-orb-2" aria-hidden="true"></div>
+
+  <!-- Galaxy Star Shower Canvas (full-page background) -->
+  <canvas id="galaxy-canvas" aria-hidden="true"></canvas>
 
   <!-- Preloader -->
   <div id="preloader" role="status" aria-label="Loading">
@@ -64,7 +71,7 @@
       <a href="#contact">Contact</a>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <button class="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+      <button class="theme-toggle" aria-label="Toggle theme mode" title="Switch theme">
         <span class="icon">&#9728;&#65039;</span>
       </button>
       <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">

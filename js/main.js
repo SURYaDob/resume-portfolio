@@ -431,40 +431,228 @@ class Navigation {
 }
 
 // =============================================
-// THEME TOGGLE (Dark/Light mode with system preference)
+// GALAXY STAR SHOWER (Canvas Background Animation)
+// =============================================
+class GalaxyStarShower {
+  constructor() {
+    this.canvas = document.getElementById('galaxy-canvas');
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.stars = [];
+    this.shootingStars = [];
+    this.mouse = { x: -1000, y: -1000 };
+    this.lastShootingStar = 0;
+
+    this.resize();
+    this.createStars();
+    this.animate();
+    this.bindEvents();
+  }
+
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
+
+  createStars() {
+    this.stars = [];
+    const count = Math.floor((this.canvas.width * this.canvas.height) / 2500);
+    const minStars = 200;
+    for (let i = 0; i < Math.max(count, minStars); i++) {
+      this.stars.push(this.createStar());
+    }
+  }
+
+  createStar() {
+    const size = Math.random() * 2.5 + 0.5;
+    const isBright = Math.random() < 0.15;
+    return {
+      x: Math.random() * this.canvas.width,
+      y: Math.random() * this.canvas.height,
+      size: size,
+      baseSize: size,
+      opacity: Math.random() * 0.6 + 0.2,
+      baseOpacity: Math.random() * 0.6 + 0.2,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinklePhase: Math.random() * Math.PI * 2,
+      isBright: isBright,
+      color: isBright
+        ? ['255, 215, 0', '255, 255, 255', '200, 220, 255', '255, 200, 150'][Math.floor(Math.random() * 4)]
+        : ['180, 180, 220', '200, 180, 220', '220, 200, 255', '180, 200, 255'][Math.floor(Math.random() * 4)],
+      driftX: (Math.random() - 0.5) * 0.15,
+      driftY: (Math.random() - 0.5) * 0.15,
+    };
+  }
+
+  createShootingStar() {
+    const angle = Math.random() * Math.PI * 0.5 - Math.PI * 0.25;
+    const speed = Math.random() * 12 + 6;
+    return {
+      x: Math.random() * this.canvas.width * 0.8 + this.canvas.width * 0.1,
+      y: Math.random() * this.canvas.height * 0.4,
+      length: Math.random() * 60 + 40,
+      speed: speed,
+      angle: angle,
+      opacity: 1,
+      life: 1,
+      decay: Math.random() * 0.01 + 0.008,
+      color: `255, ${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 50 + 200)}`,
+    };
+  }
+
+  bindEvents() {
+    window.addEventListener('resize', () => {
+      this.resize();
+      this.createStars();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      this.mouse.x = e.clientX;
+      this.mouse.y = e.clientY;
+    });
+  }
+
+  drawNebula(x, y, radius, color) {
+    const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, `rgba(${color}, 0.03)`);
+    gradient.addColorStop(0.5, `rgba(${color}, 0.015)`);
+    gradient.addColorStop(1, `rgba(${color}, 0)`);
+    this.ctx.fillStyle = gradient;
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+    this.ctx.fill();
+  }
+
+  animate() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Draw subtle nebula clouds
+    this.drawNebula(this.canvas.width * 0.2, this.canvas.height * 0.3, 300, '255, 45, 149');
+    this.drawNebula(this.canvas.width * 0.8, this.canvas.height * 0.6, 350, '108, 99, 255');
+    this.drawNebula(this.canvas.width * 0.5, this.canvas.height * 0.2, 250, '0, 212, 170');
+
+    // Update & draw stars
+    this.stars.forEach((star) => {
+      // Twinkle effect
+      star.twinklePhase += star.twinkleSpeed;
+      const twinkle = Math.sin(star.twinklePhase) * 0.4 + 0.6;
+      const currentOpacity = star.baseOpacity * twinkle;
+
+      // Gentle drift
+      star.x += star.driftX;
+      star.y += star.driftY;
+
+      // Wrap around
+      if (star.x < -10) star.x = this.canvas.width + 10;
+      if (star.x > this.canvas.width + 10) star.x = -10;
+      if (star.y < -10) star.y = this.canvas.height + 10;
+      if (star.y > this.canvas.height + 10) star.y = -10;
+
+      // Mouse interaction — gentle attraction
+      const dx = this.mouse.x - star.x;
+      const dy = this.mouse.y - star.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 200 && dist > 0) {
+        const force = (200 - dist) / 200;
+        star.x -= dx * force * 0.003;
+        star.y -= dy * force * 0.003;
+      }
+
+      // Draw star
+      this.ctx.beginPath();
+      this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+      this.ctx.fillStyle = `rgba(${star.color}, ${currentOpacity})`;
+      this.ctx.fill();
+
+      // Glow for bright stars
+      if (star.isBright && star.size > 1.5) {
+        this.ctx.beginPath();
+        this.ctx.arc(star.x, star.y, star.size * 3, 0, Math.PI * 2);
+        this.ctx.fillStyle = `rgba(${star.color}, ${currentOpacity * 0.08})`;
+        this.ctx.fill();
+      }
+    });
+
+    // Shooting stars
+    const now = Date.now();
+    if (now - this.lastShootingStar > 3000 + Math.random() * 4000) {
+      this.shootingStars.push(this.createShootingStar());
+      this.lastShootingStar = now;
+    }
+
+    this.shootingStars = this.shootingStars.filter((ss) => {
+      ss.x += Math.cos(ss.angle) * ss.speed;
+      ss.y += Math.sin(ss.angle) * ss.speed;
+      ss.life -= ss.decay;
+
+      if (ss.life <= 0) return false;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(ss.x, ss.y);
+      this.ctx.lineTo(
+        ss.x - Math.cos(ss.angle) * ss.length,
+        ss.y - Math.sin(ss.angle) * ss.length
+      );
+      this.ctx.strokeStyle = `rgba(${ss.color}, ${ss.life * 0.8})`;
+      this.ctx.lineWidth = ss.life * 2 + 0.5;
+      this.ctx.stroke();
+
+      // Glow at head
+      this.ctx.beginPath();
+      this.ctx.arc(ss.x, ss.y, ss.life * 3 + 1, 0, Math.PI * 2);
+      this.ctx.fillStyle = `rgba(${ss.color}, ${ss.life * 0.2})`;
+      this.ctx.fill();
+
+      return true;
+    });
+
+    requestAnimationFrame(() => this.animate());
+  }
+}
+
+// =============================================
+// THEME TOGGLE (Dark/Light/Galaxy mode with system preference)
 // =============================================
 class ThemeToggle {
   constructor() {
     this.toggle = document.querySelector('.theme-toggle');
     this.icon = this.toggle?.querySelector('.icon');
+    this.themes = ['dark', 'light', 'galaxy'];
+    this.icons = ['☀️', '🌙', '🌌'];
     this.init();
   }
 
   init() {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    this.isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    if (savedTheme) {
+      this.currentIndex = this.themes.indexOf(savedTheme);
+      if (this.currentIndex === -1) this.currentIndex = prefersDark ? 0 : 1;
+    } else {
+      this.currentIndex = prefersDark ? 0 : 1;
+    }
 
     this.applyTheme();
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       if (!localStorage.getItem('theme')) {
-        this.isDark = e.matches;
+        this.currentIndex = e.matches ? 0 : 1;
         this.applyTheme();
       }
     });
 
     this.toggle?.addEventListener('click', () => {
-      this.isDark = !this.isDark;
-      localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+      this.currentIndex = (this.currentIndex + 1) % this.themes.length;
+      localStorage.setItem('theme', this.themes[this.currentIndex]);
       this.applyTheme();
     });
   }
 
   applyTheme() {
-    this.icon.textContent = this.isDark ? '☀️' : '🌙';
-    document.documentElement.setAttribute('data-theme', this.isDark ? 'dark' : 'light');
+    const theme = this.themes[this.currentIndex];
+    this.icon.textContent = this.icons[this.currentIndex];
+    document.documentElement.setAttribute('data-theme', theme);
   }
 }
 
@@ -733,6 +921,7 @@ document.addEventListener('DOMContentLoaded', () => {
     new CounterAnimation();
   }, 100);
 
+  new GalaxyStarShower();
   new Navigation();
   new ThemeToggle();
   new ButtonRipple();

@@ -71,6 +71,39 @@
   --gradient-glass: linear-gradient(135deg, rgba(108, 99, 255, 0.05), rgba(0, 212, 170, 0.03));
 }
 
+/* Galaxy / Cosmic Theme Variables */
+[data-theme="galaxy"] {
+  --primary: #ff2d95;
+  --primary-dark: #e01a7a;
+  --primary-light: #ff6bcb;
+  --primary-glow: rgba(255, 45, 149, 0.4);
+  --secondary: #ffd700;
+  --secondary-light: #ffe44d;
+  --accent: #ff6b6b;
+  --accent2: #00d4aa;
+  --accent3: #6bcbff;
+
+  --bg-primary: #0d0221;
+  --bg-secondary: #150433;
+  --bg-card: rgba(40, 10, 70, 0.6);
+  --bg-card-hover: rgba(55, 20, 90, 0.8);
+  --bg-glass: rgba(40, 10, 70, 0.4);
+
+  --text-primary: #f0e6ff;
+  --text-secondary: #c0a0e0;
+  --text-muted: #705090;
+
+  --gradient-1: linear-gradient(135deg, #ff2d95, #ffd700);
+  --gradient-2: linear-gradient(135deg, #ffd700, #ff6b6b);
+  --gradient-3: linear-gradient(135deg, #ff2d95, #6bcbff);
+  --gradient-hero: linear-gradient(135deg, #0d0221 0%, #1f0040 50%, #0d0221 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 45, 149, 0.1), rgba(255, 215, 0, 0.05));
+  --gradient-border: linear-gradient(135deg, rgba(255, 45, 149, 0.5), rgba(255, 215, 0, 0.2), rgba(255, 45, 149, 0.1));
+
+  --shadow-glow: 0 0 40px rgba(255, 45, 149, 0.2);
+  --shadow-glow-intense: 0 0 60px rgba(255, 45, 149, 0.3);
+}
+
 /* ----- Reset & Base ----- */
 *, *::before, *::after {
   margin: 0;
@@ -208,6 +241,33 @@ ul {
 }
 
 /* =============================================
+   GALAXY STAR SHOWER CANVAS
+   ============================================= */
+#galaxy-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+[data-theme="galaxy"] #galaxy-canvas {
+  opacity: 1;
+}
+
+[data-theme="dark"] #galaxy-canvas {
+  opacity: 0.4;
+}
+
+[data-theme="light"] #galaxy-canvas {
+  opacity: 0.15;
+}
+
+/* =============================================
    GLOW ORB (Background Decoration)
    ============================================= */
 .glow-orb {
@@ -325,6 +385,16 @@ ul {
 [data-theme="light"] .navbar {
   background: rgba(248, 249, 255, 0.6);
   border-bottom-color: rgba(108, 99, 255, 0.08);
+}
+
+[data-theme="galaxy"] .navbar {
+  background: rgba(13, 2, 33, 0.6);
+  border-bottom-color: rgba(255, 45, 149, 0.12);
+}
+
+[data-theme="galaxy"] .navbar.scrolled {
+  background: rgba(13, 2, 33, 0.85);
+  box-shadow: 0 4px 30px rgba(255, 45, 149, 0.15);
 }
 
 .navbar.scrolled {
@@ -2129,7 +2199,7 @@ ul {
     top: var(--nav-height);
     left: 0;
     right: 0;
-    background: rgba(10, 10, 26, 0.95);
+    background: var(--bg-primary);
     backdrop-filter: blur(24px);
     flex-direction: column;
     padding: 16px;
