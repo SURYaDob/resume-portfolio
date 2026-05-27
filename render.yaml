@@ -4,11 +4,10 @@
 services:
   - type: web
     name: suraj-portfolio-api
-    runtime: java
+    runtime: docker
     repo: https://github.com/SURYaDob/resume-porfolio
     rootDir: backend
-    buildCommand: chmod +x ./mvnw && ./mvnw clean package -DskipTests -Dspring.profiles.active=prod
-    startCommand: java -jar target/portfolio-backend-1.0.0.jar
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
