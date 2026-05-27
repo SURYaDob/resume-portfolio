@@ -1,0 +1,21 @@
+# Render Blueprint — deploy the portfolio backend with one click
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: suraj-portfolio-api
+    runtime: java
+    repo: https://github.com/SURYaDob/resume-porfolio
+    rootDir: backend
+    buildCommand: ./mvnw clean package -DskipTests -Dspring.profiles.active=prod
+    startCommand: java -jar -Dspring.profiles.active=prod target/portfolio-backend-1.0.0.jar
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: CORS_ORIGINS
+        value: https://SURYaDob.github.io
+      - key: SMTP_PASSWORD
+        sync: false  # Set this manually in the Render dashboard
+      - key: SMTP_USERNAME
+        value: surajdobale29@gmail.com
+    healthCheckPath: /api/health
