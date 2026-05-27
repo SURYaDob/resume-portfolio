@@ -866,136 +866,6 @@ class SmoothAnchors {
 }
 
 // =============================================
-// CONTACT FORM — Sends via Spring Boot API with email fallback
-// =============================================
-class ContactForm {
-  constructor() {
-    this.form = document.getElementById('contactForm');
-    this.recipientEmail = 'surajdobale29@gmail.com';
-
-    // Auto-detect backend URL:
-    // - Local development → localhost:8080
-    // - Production (GitHub Pages) → deployed Render/Railway URL
-    // Update PROD_BACKEND_URL after deploying the backend
-    this.PROD_BACKEND_URL = 'https://suraj-porfolio-api.onrender.com/api/contact';
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    this.backendUrl = isLocal ? 'http://localhost:8080/api/contact' : this.PROD_BACKEND_URL;
-
-    this.init();
-  }
-
-  init() {
-    this.form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitBtn = this.form.querySelector('.btn');
-      const originalHTML = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span class="btn-text">⏳ Sending...</span>';
-      submitBtn.disabled = true;
-
-      try {
-        // Try Spring Boot backend first
-        const formData = new FormData(this.form);
-        const jsonData = {};
-        formData.forEach((value, key) => { jsonData[key] = value; });
-
-        let response;
-        let usedBackend = false;
-        try {
-          response = await fetch(this.backendUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(jsonData),
-          });
-          usedBackend = true;
-        } catch (e) {
-          // Backend not available — use mailto fallback
-          usedBackend = false;
-        }
-
-        if (usedBackend && response.ok) {
-          // Success via backend
-          this.showSuccessMessage();
-        } else {
-          // Backend unavailable or failed — open mailto link
-          this.openMailTo(jsonData);
-        }
-      } catch (err) {
-        submitBtn.innerHTML = originalHTML;
-        submitBtn.disabled = false;
-      }
-    });
-  }
-
-  /**
-   * Show success message replacing the form.
-   */
-  showSuccessMessage() {
-    const successMsg = document.createElement('div');
-    successMsg.style.cssText = `
-      text-align: center;
-      padding: 40px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(12px);
-      border-radius: var(--border-radius);
-      border: 1px solid rgba(108, 99, 255, 0.15);
-      animation: fadeInUp 0.5s ease;
-    `;
-    successMsg.innerHTML = `
-      <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
-      <h3 style="margin-bottom: 8px;">Message Sent Successfully!</h3>
-      <p style="color: var(--text-secondary);">Thank you for reaching out. I'll respond within 24 hours.</p>
-    `;
-    this.form.innerHTML = '';
-    this.form.style.display = 'flex';
-    this.form.appendChild(successMsg);
-  }
-
-  /**
-   * Fallback: open the visitor's email client with pre-filled details.
-   * This is reliable because it doesn't depend on any third-party service.
-   */
-  openMailTo(jsonData) {
-    const name = jsonData.name || '';
-    const email = jsonData.email || '';
-    const subject = jsonData.subject || 'Portfolio Inquiry';
-    const message = jsonData.message || '';
-
-    const mailBody = `Hi Suraj,%0D%0A%0D%0AMy name is ${encodeURIComponent(name)}.${encodeURIComponent(message) ? '%0D%0A%0D%0A' + encodeURIComponent(message) : ''}%0D%0A%0D%0AYou can reach me at: ${encodeURIComponent(email)}`;
-    const mailSubject = encodeURIComponent(subject);
-    const mailtoLink = `mailto:${this.recipientEmail}?subject=${mailSubject}&body=${mailBody}`;
-
-    // Show a prompt explaining what to do
-    const promptEl = document.createElement('div');
-    promptEl.style.cssText = `
-      text-align: center;
-      padding: 32px 24px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(12px);
-      border-radius: var(--border-radius);
-      border: 1px solid rgba(108, 99, 255, 0.15);
-      animation: fadeInUp 0.5s ease;
-    `;
-    promptEl.innerHTML = `
-      <div style="font-size: 2.5rem; margin-bottom: 12px;">📧</div>
-      <h3 style="margin-bottom: 8px;">Almost Done!</h3>
-      <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">
-        The direct send is not available. Please click below to send via your email client —<br>
-        the message details are already filled in.
-      </p>
-      <a href="${mailtoLink}" class="btn btn-primary" style="text-decoration: none;">
-        <span class="btn-text">✉️ Open Email Client</span>
-      </a>
-      <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-secondary); opacity: 0.7;">
-        Or email directly: <strong>${this.recipientEmail}</strong>
-      </p>
-    `;
-    this.form.innerHTML = '';
-    this.form.style.display = 'flex';
-    this.form.appendChild(promptEl);
-  }
-}
-
-// =============================================
 // INITIALIZE EVERYTHING
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1026,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
   new TiltEffect();
   new CertificateLightbox();
   new SmoothAnchors();
-  new ContactForm();
+
 
   if (!('ontouchstart' in window)) {
     setTimeout(() => new MouseFollower(), 200);
