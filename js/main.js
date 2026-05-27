@@ -657,6 +657,17 @@ class ThemeToggle {
     document.documentElement.classList.add('theme-switching');
     document.documentElement.setAttribute('data-theme', theme);
 
+    // Swap favicon to match the current theme
+    const faviconMap = {
+      dark: 'favicon.svg',
+      light: 'favicon-light.svg',
+      galaxy: 'favicon-galaxy.svg',
+    };
+    const link = document.querySelector('link[rel="icon"]');
+    if (link) {
+      link.href = faviconMap[theme] || 'favicon.svg';
+    }
+
     // Remove transition guard after animation completes
     // so hover/active transitions resume normally
     setTimeout(() => {
@@ -860,8 +871,8 @@ class SmoothAnchors {
 class ContactForm {
   constructor() {
     this.form = document.getElementById('contactForm');
+    this.recipientEmail = 'surajdobale29@gmail.com';
     this.backendUrl = 'http://localhost:8080/api/contact';
-    this.formspreeUrl = 'https://formspree.io/f/xqapvqkv';
     this.init();
   }
 
@@ -880,67 +891,99 @@ class ContactForm {
         formData.forEach((value, key) => { jsonData[key] = value; });
 
         let response;
+        let usedBackend = false;
         try {
           response = await fetch(this.backendUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(jsonData),
           });
+          usedBackend = true;
         } catch (e) {
-          // Backend not available — fall back to Formspree
-          const data = new FormData(this.form);
-          response = await fetch(this.formspreeUrl, {
-            method: 'POST',
-            body: data,
-            headers: { 'Accept': 'application/json' },
-          });
+          // Backend not available — use mailto fallback
+          usedBackend = false;
         }
 
-        if (response.ok) {
-          const formContainer = this.form.parentElement;
-          const successMsg = document.createElement('div');
-          successMsg.style.cssText = `
-            text-align: center;
-            padding: 40px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(108, 99, 255, 0.15);
-            animation: fadeInUp 0.5s ease;
-          `;
-          successMsg.innerHTML = `
-            <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
-            <h3 style="margin-bottom: 8px;">Message Sent Successfully!</h3>
-            <p style="color: var(--text-secondary);">Thank you for reaching out. I'll respond within 24 hours.</p>
-          `;
-          this.form.innerHTML = '';
-          this.form.style.display = 'flex';
-          this.form.appendChild(successMsg);
+        if (usedBackend && response.ok) {
+          // Success via backend
+          this.showSuccessMessage();
         } else {
-          throw new Error('Failed to send');
+          // Backend unavailable or failed — open mailto link
+          this.openMailTo(jsonData);
         }
       } catch (err) {
         submitBtn.innerHTML = originalHTML;
-        const errorMsg = document.createElement('div');
-        errorMsg.style.cssText = `
-          padding: 12px 16px;
-          background: rgba(255, 107, 107, 0.1);
-          border: 1px solid rgba(255, 107, 107, 0.2);
-          border-radius: 8px;
-          color: var(--accent);
-          font-size: 0.9rem;
-          text-align: center;
-        `;
-        errorMsg.textContent = '❌ Could not send. Please email me directly at surajdobale29@gmail.com.';
-        if (!this.form.querySelector('.form-error')) {
-          errorMsg.className = 'form-error';
-          this.form.insertBefore(errorMsg, submitBtn);
-          setTimeout(() => errorMsg.remove(), 5000);
-        }
-      } finally {
         submitBtn.disabled = false;
       }
     });
+  }
+
+  /**
+   * Show success message replacing the form.
+   */
+  showSuccessMessage() {
+    const successMsg = document.createElement('div');
+    successMsg.style.cssText = `
+      text-align: center;
+      padding: 40px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(108, 99, 255, 0.15);
+      animation: fadeInUp 0.5s ease;
+    `;
+    successMsg.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
+      <h3 style="margin-bottom: 8px;">Message Sent Successfully!</h3>
+      <p style="color: var(--text-secondary);">Thank you for reaching out. I'll respond within 24 hours.</p>
+    `;
+    this.form.innerHTML = '';
+    this.form.style.display = 'flex';
+    this.form.appendChild(successMsg);
+  }
+
+  /**
+   * Fallback: open the visitor's email client with pre-filled details.
+   * This is reliable because it doesn't depend on any third-party service.
+   */
+  openMailTo(jsonData) {
+    const name = jsonData.name || '';
+    const email = jsonData.email || '';
+    const subject = jsonData.subject || 'Portfolio Inquiry';
+    const message = jsonData.message || '';
+
+    const mailBody = `Hi Suraj,%0D%0A%0D%0AMy name is ${encodeURIComponent(name)}.${encodeURIComponent(message) ? '%0D%0A%0D%0A' + encodeURIComponent(message) : ''}%0D%0A%0D%0AYou can reach me at: ${encodeURIComponent(email)}`;
+    const mailSubject = encodeURIComponent(subject);
+    const mailtoLink = `mailto:${this.recipientEmail}?subject=${mailSubject}&body=${mailBody}`;
+
+    // Show a prompt explaining what to do
+    const promptEl = document.createElement('div');
+    promptEl.style.cssText = `
+      text-align: center;
+      padding: 32px 24px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(108, 99, 255, 0.15);
+      animation: fadeInUp 0.5s ease;
+    `;
+    promptEl.innerHTML = `
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">📧</div>
+      <h3 style="margin-bottom: 8px;">Almost Done!</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">
+        The direct send is not available. Please click below to send via your email client —<br>
+        the message details are already filled in.
+      </p>
+      <a href="${mailtoLink}" class="btn btn-primary" style="text-decoration: none;">
+        <span class="btn-text">✉️ Open Email Client</span>
+      </a>
+      <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-secondary); opacity: 0.7;">
+        Or email directly: <strong>${this.recipientEmail}</strong>
+      </p>
+    `;
+    this.form.innerHTML = '';
+    this.form.style.display = 'flex';
+    this.form.appendChild(promptEl);
   }
 }
 
