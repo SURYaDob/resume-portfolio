@@ -877,7 +877,7 @@ class ContactForm {
     // - Local development → localhost:8080
     // - Production (GitHub Pages) → deployed Render/Railway URL
     // Update PROD_BACKEND_URL after deploying the backend
-    this.PROD_BACKEND_URL = 'https://suraj-portfolio-api.onrender.com/api/contact';
+    this.PROD_BACKEND_URL = 'https://suraj-porfolio-api.onrender.com/api/contact';
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     this.backendUrl = isLocal ? 'http://localhost:8080/api/contact' : this.PROD_BACKEND_URL;
 
