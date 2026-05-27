@@ -131,20 +131,67 @@ After deploying, update the form action in `index.html`:
 <form id="contactForm" action="https://your-app.onrender.com/api/contact" method="POST">
 ```
 
-## 📧 Production Email
+## 📧 Email Notifications
 
-For production, configure SMTP in `application.properties`:
+When a visitor submits the contact form, the backend:
+1. Saves the message to the database (always)
+2. Sends a **notification email** to you asynchronously via SMTP
 
-```properties
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=surajdobale29@gmail.com
-spring.mail.password=your-app-password
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
+### Setup (Required for Emails)
+
+You need a **Gmail App Password** (not your regular password):
+
+1. Enable **2-Step Verification** on your Google Account:
+   [myaccount.google.com/security](https://myaccount.google.com/security)
+2. Go to **App Passwords**:
+   [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+3. Select **Mail** → **Windows Computer** → **Generate**
+4. Copy the 16-character password (e.g., `abcd efgh ijkl mnop`)
+
+### Configure Environment Variables
+
+Set these before running the app:
+
+```bash
+# Windows Command Prompt
+set SMTP_PASSWORD=your-16-char-app-password
+
+# OR Windows PowerShell
+$env:SMTP_PASSWORD="your-16-char-app-password"
+
+# OR set permanently in System Environment Variables
 ```
 
-Enable 2FA on Gmail and generate an App Password for the SMTP password.
+> **Optional:** Override the sender/recipient email (defaults to `surajdobale29@gmail.com`):
+> ```
+> set SMTP_USERNAME=your-email@gmail.com
+> ```
+
+### Run the Backend
+
+```bash
+cd backend
+mvnw.cmd spring-boot:run
+```
+
+The API starts at **http://localhost:8080**. Emails are sent asynchronously on contact form submission.
+
+### Verify It Works
+
+```bash
+curl -X POST http://localhost:8080/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","email":"test@example.com","subject":"Test","message":"Testing email notifications"}'
+```
+
+Check your Gmail inbox — you should receive the notification within a few seconds.
+
+### How It Works
+
+- `EmailService.java` uses `JavaMailSender` with Gmail SMTP (port 587, STARTTLS)
+- Emails are sent **asynchronously** via `@Async` — the API response is not blocked by SMTP latency
+- If email sending fails (e.g., SMTP is down), the API still returns `201 Created` — the message is safely stored in the database
+- Email includes a styled HTML template with a "Reply" button
 
 ---
 

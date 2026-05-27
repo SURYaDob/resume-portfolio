@@ -2,11 +2,13 @@ package com.portfolio.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portfolio.model.ContactMessage;
+import com.portfolio.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,6 +24,9 @@ class ContactControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private EmailService emailService;
 
     @Test
     void shouldSubmitValidContactMessage() throws Exception {

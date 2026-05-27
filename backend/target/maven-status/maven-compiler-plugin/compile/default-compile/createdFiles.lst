@@ -1,0 +1,11 @@
+com\portfolio\controller\HealthController.class
+com\portfolio\model\Skill.class
+com\portfolio\PortfolioApplication.class
+com\portfolio\model\ContactMessage.class
+com\portfolio\config\CorsConfig.class
+com\portfolio\controller\ProjectController.class
+com\portfolio\service\EmailService.class
+com\portfolio\controller\ContactController.class
+com\portfolio\repository\ContactMessageRepository.class
+com\portfolio\service\ContactService.class
+com\portfolio\model\Project.class
