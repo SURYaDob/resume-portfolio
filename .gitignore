@@ -1,0 +1,36 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# PDFs - keep only source, not generated
+*.pdf
+!resume*.pdf
+
+# Temp
+__pycache__/
+*.pyc
+nul
+# Personal documents
+pan.jpeg
+passbook.jpeg
+pan.pdf
+Cover letter.docx
+
