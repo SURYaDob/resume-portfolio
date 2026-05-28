@@ -7,11 +7,11 @@ Live demo links will be added to your portfolio once deployed.
 
 ## 📋 Overview
 
-| Project | Platform | DB | URL Pattern | Free Tier Details |
-|---------|----------|:--:|-------------|-------------------|
-| **Task Manager** | [Render](https://render.com) | H2 (in-memory) | `https://task-manager-hnk6.onrender.com` | 512MB RAM, sleeps after 15min |
-| **Laundry System** | [Render](https://render.com) | H2 (in-memory) | `https://laundry-system-gzzc.onrender.com` | 512MB RAM, sleeps after 15min |
-| **CDAC Enterprise** | [Render](https://render.com) | H2 (in-memory) | `https://cdac-enterprise.onrender.com` | 512MB RAM, sleeps after 15min |
+| Project | Platform | DB | URL Pattern | Free Tier Details | Status |
+|---------|----------|:--:|-------------|-------------------|--------|
+| **Task Manager** | [Render](https://render.com) | H2 (in-memory) | `https://task-manager-hnk6.onrender.com` | 512MB RAM, sleeps after 15min | ✅ Verified |
+| **Laundry System** | [Render](https://render.com) | H2 (in-memory) | `https://laundry-system-gzzc.onrender.com` | 512MB RAM, sleeps after 15min | ✅ Verified |
+| **CDAC Enterprise** | [Render](https://render.com) | H2 (in-memory) | `https://cdac-enterprise.onrender.com` | 512MB RAM, sleeps after 15min | ✅ Verified |
 
 ---
 
@@ -107,7 +107,27 @@ Live demo links will be added to your portfolio once deployed.
 
 ---
 
-## 4️⃣ Update Portfolio Demo Links
+## 4️⃣ Verified Credentials
+
+These credentials are pre-seeded in the demo apps and confirmed working:
+
+### Laundry System
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@aquaclean.com` | `password123` |
+| Staff | `raj@aquaclean.com` | `password123` |
+| Staff | `priya@aquaclean.com` | `password123` |
+| Customer | `amit@example.com` | `password123` |
+| Customer | `neha@example.com` | `password123` |
+
+### Task Manager & CDAC Enterprise
+
+Both apps support **self-registration** — create an account via the Register/Sign Up page to get started.
+
+---
+
+## 5️⃣ Update Portfolio Demo Links
 
 After each service is deployed, update the URLs in `index.html`:
 
@@ -137,10 +157,12 @@ To persist data, upgrade Render to the Starter plan ($7/month) or use a free MyS
 
 ## 🆘 Troubleshooting
 
+> ✅ All 3 demos have been tested end-to-end and verified working on Render's free tier.
+
 | Issue | Fix |
 |-------|-----|
 | Render app stuck "Building" | Check build logs for Maven errors. Run `mvn clean package` locally first |
 | Docker build fails | Check the repo has a Dockerfile at root. Ensure Maven build image is available |
-| Fly.io app won't connect | Use Render instead — no CLI or external DB needed |
+| App stuck on cold start | Wait 30-60s. Free tier sleeps after 15min of inactivity |
 | Cold start too slow | This is normal on free tier. First request takes 15-45 seconds |
 | App crashes on startup | Verify Java 17 compatibility. Check environment variables |
