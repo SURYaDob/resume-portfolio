@@ -10,7 +10,7 @@ Live demo links will be added to your portfolio once deployed.
 | Project | Platform | DB | URL Pattern | Free Tier Details |
 |---------|----------|:--:|-------------|-------------------|
 | **Task Manager** | [Render](https://render.com) | H2 (in-memory) | `https://task-manager-hnk6.onrender.com` | 512MB RAM, sleeps after 15min |
-| **Laundry System** | [Koyeb](https://koyeb.com) | H2 (in-memory) | `https://laundry-system.koyeb.app` | 512MB RAM, always-on! |
+| **Laundry System** | [Koyeb](https://koyeb.com) | H2 (in-memory) | `https://laundry-system-gzzc.onrender.com` | 512MB RAM, always-on! |
 | **CDAC Enterprise** | [Fly.io](https://fly.io) | MySQL/PostgreSQL | `https://cdac-enterprise.fly.dev` | 256MB RAM, 3GB storage |
 
 ---
@@ -81,7 +81,7 @@ Live demo links will be added to your portfolio once deployed.
    - Click **Deploy**
 
 3. **Verify:**
-   - Visit `https://laundry-system.koyeb.app`
+   - Visit `https://laundry-system-gzzc.onrender.com`
    - Koyeb stays always-on (no cold starts!)
    - Login with default credentials if the app has seeded data
 
