@@ -978,18 +978,28 @@ ul {
   filter: blur(4px);
 }
 
+.avatar-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--border-radius-xl);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 8px 32px rgba(108, 99, 255, 0.3);
+  pointer-events: none;
+  z-index: 2;
+}
+
 @keyframes rotateGradient {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-.avatar-placeholder {
+.avatar-placeholder,
+.avatar-img {
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 5rem;
   background: var(--bg-card);
-  backdrop-filter: blur(8px);
   border-radius: var(--border-radius-xl);
   margin: 3px;
   width: calc(100% - 6px);
@@ -997,7 +1007,14 @@ ul {
   transition: var(--transition);
 }
 
-.avatar-frame:hover .avatar-placeholder {
+.avatar-img {
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+}
+
+.avatar-frame:hover .avatar-placeholder,
+.avatar-frame:hover .avatar-img {
   transform: scale(1.05);
 }
 
