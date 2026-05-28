@@ -11,7 +11,7 @@ Live demo links will be added to your portfolio once deployed.
 |---------|----------|:--:|-------------|-------------------|
 | **Task Manager** | [Render](https://render.com) | H2 (in-memory) | `https://task-manager-hnk6.onrender.com` | 512MB RAM, sleeps after 15min |
 | **Laundry System** | [Render](https://render.com) | H2 (in-memory) | `https://laundry-system-gzzc.onrender.com` | 512MB RAM, sleeps after 15min |
-| **CDAC Enterprise** | [Fly.io](https://fly.io) | MySQL/PostgreSQL | `https://cdac-enterprise.fly.dev` | 256MB RAM, 3GB storage |
+| **CDAC Enterprise** | [Render](https://render.com) | H2 (in-memory) | `https://cdac-enterprise.onrender.com` | 512MB RAM, sleeps after 15min |
 
 ---
 
@@ -79,60 +79,31 @@ Live demo links will be added to your portfolio once deployed.
 
 ---
 
-## 3️⃣ Deploy CDAC Enterprise on Fly.io
+## 3️⃣ Deploy CDAC Enterprise on Render
 
 ### Prerequisites
-- A [Fly.io](https://fly.io) account (requires credit card for verification, free tier usage)
-- [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/) installed locally
+- Your [Render](https://render.com) account (already set up from Task Manager)
+- The Dockerfile pushed to your enterprise repo (with H2 profile support)
 
 ### Steps
 
 1. **Add deploy files to your repo:**
-   ```bash
-   cp deploy-configs/cdac-enterprise/fly.toml /path/to/enterprise/
-   
-   cd /path/to/enterprise
-   git add fly.toml
-   git commit -m "Add Fly.io deployment configuration"
-   git push origin master
-   ```
+   H2 dependency was added to `pom.xml` and an `application-h2.properties` file was created for in-memory demo deployment.
 
-2. **Deploy via Fly CLI:**
-   ```bash
-   # Install Fly CLI (Windows/Mac/Linux)
-   # Windows: winget install flyctl
-   # Mac: brew install flyctl
-   # Linux: curl -L https://fly.io/install.sh | sh
-   
-   flyctl auth login
-   cd /path/to/enterprise
-   flyctl launch
-   # → Name: cdac-enterprise
-   # → Region: bom (Mumbai - closest to Nagpur)
-   # → Leave Dockerfile as-is
-   
-   # Set required secrets
-   flyctl secrets set SPRING_PROFILES_ACTIVE=prod
-   flyctl secrets set DB_URL=jdbc:mysql://host:port/dbname
-   flyctl secrets set DB_USERNAME=your_db_user
-   flyctl secrets set DB_PASSWORD=your_db_pass
-   flyctl secrets set JWT_SECRET=$(openssl rand -base64 32)
-   flyctl secrets set CORS_ALLOWED_ORIGINS=https://SURYaDob.github.io
-   
-   # Note: For the database, you can use:
-   # Option A: Fly.io PostgreSQL (Recommended)
-   #   flyctl postgres create --name cdac-db
-   #   flyctl postgres attach cdac-db
-   # Option B: Free MySQL from aiven.io
-   
-   flyctl deploy
-   ```
+2. **In Render Dashboard:**
+   - Click **New +** → **Web Service**
+   - Connect to `SURYaDob/enterprise` (master branch)
+   - **Name:** `cdac-enterprise`
+   - **Runtime:** Docker (auto-detected)
+   - **Plan:** Free
+   - **Environment variables:** `SPRING_PROFILES_ACTIVE` = `h2`
+   - Click **Create Web Service**
 
 3. **Verify:**
-   - Visit `https://cdac-enterprise.fly.dev`
-   - Check health: `https://cdac-enterprise.fly.dev/actuator/health`
-   - Swagger UI: `https://cdac-enterprise.fly.dev/swagger-ui.html`
-   - Add a test record via the Swagger UI
+   - Visit `https://cdac-enterprise.onrender.com`
+   - First load takes ~30s (cold start)
+   - Uses H2 in-memory DB (data resets on restart)
+   - Swagger UI: `https://cdac-enterprise.onrender.com/swagger-ui.html`
 
 ---
 
@@ -170,6 +141,6 @@ To persist data, upgrade Render to the Starter plan ($7/month) or use a free MyS
 |-------|-----|
 | Render app stuck "Building" | Check build logs for Maven errors. Run `mvn clean package` locally first |
 | Docker build fails | Check the repo has a Dockerfile at root. Ensure Maven build image is available |
-| Fly.io app won't connect | Check `flyctl logs`. Ensure DB connection string is correct |
+| Fly.io app won't connect | Use Render instead — no CLI or external DB needed |
 | Cold start too slow | This is normal on free tier. First request takes 15-45 seconds |
 | App crashes on startup | Verify Java 17 compatibility. Check environment variables |
