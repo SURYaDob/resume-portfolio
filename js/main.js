@@ -675,62 +675,31 @@ class ButtonRipple {
 }
 
 // =============================================
-// 3D TILT & PARALLAX EFFECT
-// Applies to: Project Cards (strong), Certificate Cards (moderate), Avatar Frame (gentle)
+// 3D TILT EFFECT (Simplified)
+// Gentle tilt on project cards and avatar frame only
 // =============================================
 class TiltEffect {
   constructor() {
-    // Project cards — existing strong tilt
-    document.querySelectorAll('.project-card').forEach((card) => {
-      this.addTilt(card, { intensity: 15, translateY: -8, scale: 1.02 });
-    });
+    document.querySelectorAll('.project-card, .avatar-frame').forEach((el) => {
+      const isAvatar = el.classList.contains('avatar-frame');
+      const intensity = isAvatar ? 30 : 25;
 
-    // Avatar frame — gentle tilt with extra glow depth
-    const avatar = document.querySelector('.avatar-frame');
-    if (avatar) {
-      this.addTilt(avatar, { intensity: 25, translateY: 0, scale: 1 });
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / intensity;
+        const rotateY = (centerX - x) / intensity;
+        el.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
 
-      // Also tilt the inner placeholder slightly more for a parallax feel
-      const placeholder = avatar.querySelector('.avatar-placeholder');
-      if (placeholder) {
-        let tiltX = 0, tiltY = 0;
-        avatar.addEventListener('mousemove', (e) => {
-          const rect = avatar.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          tiltX = (y - centerY) / 30;
-          tiltY = (centerX - x) / 30;
-          placeholder.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.08)`;
-        });
-        avatar.addEventListener('mouseleave', () => {
-          placeholder.style.transform = '';
-        });
-      }
-    }
-  }
-
-  addTilt(element, opts) {
-    const { intensity, translateY, scale } = opts;
-
-    element.addEventListener('mousemove', (e) => {
-      const rect = element.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = (y - centerY) / intensity;
-      const rotateY = (centerX - x) / intensity;
-      element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${translateY}px) scale(${scale})`;
-    });
-
-    element.addEventListener('mouseleave', () => {
-      element.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)`;
-      element.style.transition = 'transform 0.5s ease';
-      setTimeout(() => {
-        element.style.transition = '';
-      }, 500);
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = '';
+        el.style.transition = 'transform 0.4s ease';
+        setTimeout(() => { el.style.transition = ''; }, 400);
+      });
     });
   }
 }
@@ -917,34 +886,6 @@ class MagneticButtons {
 }
 
 // =============================================
-// PROJECT CARD SPOTLIGHT EFFECT
-// A radial gradient light follows the cursor on each card
-// =============================================
-class CardSpotlight {
-  constructor() {
-    document.querySelectorAll('[data-spotlight]').forEach((card) => {
-      this.addSpotlight(card);
-    });
-  }
-
-  addSpotlight(card) {
-    const spotlight = card.querySelector('.card-spotlight');
-    if (!spotlight) return;
-
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      spotlight.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(108, 99, 255, 0.15), transparent 70%)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      spotlight.style.background = '';
-    });
-  }
-}
-
-// =============================================
 // TEXT SCRAMBLE EFFECT
 // Animates section titles with a scramble/decode reveal
 // =============================================
@@ -1073,7 +1014,6 @@ document.addEventListener('DOMContentLoaded', () => {
   new TiltEffect();
   new SmoothAnchors();
   new MagneticButtons();
-  new CardSpotlight();
 
   if (!('ontouchstart' in window)) {
     setTimeout(() => new MouseFollower(), 200);
