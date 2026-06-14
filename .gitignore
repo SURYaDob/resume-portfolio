@@ -25,6 +25,9 @@ node_modules/
 *.pdf
 !resume*.pdf
 
+# Build artifacts
+backend/target/
+
 # Temp
 __pycache__/
 *.pyc
